@@ -29,7 +29,7 @@ El dataset no se incluye por tamaño. Se puede descargar de Kaggle: `emmarex/pla
 - `models/`: modelos, historiales, métricas y reportes.
 - `images/`: figuras del notebook.
 
-El modelo MLP pesa 304 MB y está en la sección **Releases** del repositorio. El CNN (`models/cnn_ep2.keras`, 39,7 MB) está en el repo.
+El modelo MLP pesa 290 MB y está en [Releases v1.0](https://github.com/mtgutierrezh/tly1102-ep2-tomate/releases/tag/v1.0). El CNN (`models/cnn_ep2.keras`, 39,7 MB) está en el repo.
 
 ## Reproducibilidad
 
