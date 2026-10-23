@@ -1,4 +1,4 @@
-# EP2 — MLP vs CNN para patologías en tomate
+# EP2 - MLP vs CNN para patologías en tomate
 
 **Asignatura:** Técnicas Avanzadas de Machine Learning (TLY1102)  
 **Sección:** 001D  
@@ -11,15 +11,7 @@ Comparamos un MLP y una CNN para clasificar 10 clases de hojas de tomate del dat
 - MLP: 71,5% accuracy, 64,6% F1 macro, 25.331.850 parámetros.
 - CNN: 94,1% accuracy, 93,2% F1 macro, 3.305.930 parámetros.
 
-La CNN usa 7,7 veces menos parámetros y obtiene mejores métricas. El MLP no sobreajusta, pero se queda corto por underfitting.
-
-## Cómo ejecutar en Colab
-
-1. Subir `PlantVillage Dataset.zip` a `/content`.
-2. Activar GPU T4 en *Entorno de ejecución → Cambiar tipo de hardware*.
-3. Abrir `EP2_Gutierrez_Larenas_Mena.ipynb` y ejecutar todo.
-
-El dataset no se incluye por tamaño. Se puede descargar de Kaggle: `emmarex/plantdisease`.
+La CNN usa menos parámetros y obtiene mejores métricas. El MLP no sobreajusta, pero se queda corto por underfitting.
 
 ## Estructura
 
