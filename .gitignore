@@ -1,0 +1,12 @@
+PlantVillage Dataset/
+PlantVillage Dataset.zip
+*.zip
+backups/
+data/PlantVillage/
+data/plantvillage/
+models/mlp_ep2.keras
+.EP2_localrun.ipynb
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+.DS_Store
