@@ -14,6 +14,8 @@ Este repositorio contiene la Evaluación Parcial 3. Reutiliza el dataset y el sp
 
 La CNN es el modelo recomendado. La MLP queda como línea base y alternativa liviana. Los modelos se publican en el release `v2.0`.
 
+La brecha train-test de 5,5 y 18,5 puntos del informe corresponde a la última época. En la mejor época, que es la que se guarda, es 5,4 y 15,7. Las curvas marcan la mejor época y la ventana de paciencia.
+
 ## Qué cambió respecto de la EP2
 
 | Elemento | EP2 | EP3 |

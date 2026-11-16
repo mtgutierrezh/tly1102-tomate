@@ -83,11 +83,11 @@ Contenido para 12 diapositivas. Cada bloque se puede copiar a PowerPoint o Canva
 - CNN final: accuracy 94,4%, F1 macro 93,0%.
 - MLP final: accuracy 69,2%, F1 macro 65,1%.
 - La CNN usa menos parámetros y tarda más por época.
-- La brecha train-test se reporta para las dos arquitecturas.
+- La brecha en la mejor época es 5,4 puntos en la CNN y 15,7 en la MLP.
 
 **Figura:** `images/curvas_cnn_final_semilla_42.png`, `images/matriz_cnn_final_semilla_42.png` y `images/comparacion_modelos.png`.
 
-**Idea clave:** La CNN gana en F1 macro y generalización.
+**Idea clave:** La CNN gana en F1 macro y generalización. El modelo final es la mejor época, no la última.
 
 ## Diapositiva 9. Auditoría de sesgos
 

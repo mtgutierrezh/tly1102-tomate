@@ -183,12 +183,25 @@ El espacio de búsqueda cubre la tasa de aprendizaje en escala logarítmica entr
 
 ## 12. Resultados experimentales
 
-La CNN final obtuvo 94,4% de accuracy y 93,0% de F1 macro en test, con una brecha train-test de 5,5 puntos. La MLP final obtuvo 69,2% de accuracy y 65,1% de F1 macro, con una brecha de 18,5 puntos. La diferencia de 27,9 puntos de F1 macro y la menor variación entre semillas de la CNN respaldan la elección de la CNN.
+La CNN final obtuvo 94,4% de accuracy y 93,0% de F1 macro en test. La MLP final obtuvo 69,2% y 65,1%. La diferencia de 27,9 puntos de F1 macro y la menor variación entre semillas de la CNN respaldan la elección de la CNN.
 
-| Modelo    | Accuracy   | F1 macro   | F1 ponderado   |   ROC-AUC | Parámetros   | Entrenamiento   | Inferencia   | Brecha test   | F1 media   | F1 desviación   |
+La brecha train-test de la última época es 5,5 y 18,5 puntos. La tabla 12.1 muestra la brecha en la mejor época, que es la que se guarda.
+
+| Modelo    | Accuracy   | F1 macro   | F1 ponderado   |   ROC-AUC | Parámetros   | Entrenamiento   | Inferencia   | Brecha test última | F1 media   | F1 desviación   |
 |:----------|:-----------|:-----------|:---------------|----------:|:-------------|:----------------|:-------------|:--------------|:-----------|:----------------|
 | CNN final | 94,4%      | 93,0%      | 94,4%          |     0,997 | 4,290,378    | 3,4 min         | 6,2 ms       | 5,5 pp        | 93,0%      | 0,1 pp          |
 | MLP final | 69,2%      | 65,1%      | 69,2%          |     0,964 | 12,626,762   | 1,5 min         | 4,6 ms       | 18,5 pp       | 57,9%      | 6,8 pp          |
+
+### 12.1 Lectura de las curvas
+
+| Modelo | Mejor época | Val loss | Val acc | Train acc | Brecha train-val | Última época | Val acc última | Brecha train-val última | Test acc |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| CNN | 9 de 14 | 0,1739 | 94,50% | 99,89% | 5,4 pp | 14 | 90,94% | 9,0 pp | 94,44% |
+| MLP | 17 de 22 | 0,9823 | 70,08% | 84,98% | 14,9 pp | 22 | 52,28% | 35,5 pp | 69,23% |
+
+La separación que se observa al final de las curvas corresponde a la ventana de paciencia. El modelo que se guarda es el de la mejor época, no el de la última. En la CNN la mejor época es la 9 de 14, con 99,89% de accuracy de train, 94,50% de validación y 94,44% de test. La brecha contra test es 5,4 puntos.
+
+La pérdida se separa más que la accuracy porque mide confianza, no solo aciertos. La validación es pequeña y desbalanceada, así que la curva tiene picos. La MLP tiene una brecha mayor: en la época 17, 84,98% de train, 70,08% de validación y 69,23% de test, con 15,7 puntos. La MLP sobreajusta más y no es la recomendada.
 
 ![Curvas de la CNN final](images/curvas_cnn_final_semilla_42.png)
 

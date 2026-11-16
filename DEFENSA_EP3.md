@@ -213,6 +213,9 @@ Validación con imágenes de campo, calibración de probabilidades, revisión co
 **40. ¿Cuál es el aporte principal del trabajo?**  
 Un pipeline reproducible, con split fijo, semillas, experimentos, auditoría y explicabilidad. La decisión entre MLP y CNN queda respaldada por evidencia y no solo por una corrida.
 
+**41. La curva de validación se separa de la de entrenamiento, ¿por qué?**  
+La curva muestra la ventana de paciencia. El modelo se guarda en la mejor época, no en la última. En la CNN la mejor época es la 9 de 14, con 99,89% de train, 94,50% de validación y 94,44% de test, una brecha de 5,4 puntos. La pérdida se separa más porque mide confianza. La MLP tiene 15,7 puntos de brecha en la mejor época y 35,5 en la última, por eso no la recomendamos.
+
 ## Cierre de un minuto
 
 La CNN es el modelo recomendado porque aprovecha la estructura espacial, usa menos parámetros y generaliza mejor. La MLP queda como línea base. El pipeline es reproducible y deja trazabilidad de cada decisión. La limitación principal es el dataset de laboratorio, así que el siguiente paso es validar con imágenes de campo. Gracias.
