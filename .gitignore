@@ -5,6 +5,8 @@ backups/
 data/PlantVillage/
 data/plantvillage/
 models/*.keras
+INFORME_TECNICO.md
+DEFENSA_EP3.md
 models/*.h5
 models/*.hdf5
 notebooks/*.log

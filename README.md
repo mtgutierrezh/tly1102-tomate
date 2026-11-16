@@ -1,130 +1,31 @@
-# EP3. Pipeline integrado y comparación MLP vs CNN para patologías en tomate
+# Clasificación de patologías en tomate
 
-**TLY1102 Técnicas Avanzadas de Machine Learning I, sección 001D**  
-Matías Gutiérrez, David Larenas, Victor Mena
+Comparación de una MLP y una CNN con un pipeline reproducible de aprendizaje profundo.
 
-Este repositorio contiene la Evaluación Parcial 3. Reutiliza el dataset y el split de la EP2, incorpora regularización, búsqueda de hiperparámetros, auditoría de sesgos y explicabilidad. El objetivo es comparar una MLP y una CNN con un pipeline reproducible y elegir la mejor solución con evidencia.
+## Datos
+
+PlantVillage, 10 clases de tomate y 16.011 imágenes. Split de 12.808 para entrenamiento, 1.601 para validación y 1.602 para test, con semilla 42.
 
 ## Resultados
 
-| Modelo | Accuracy | F1 macro | F1 ponderado | ROC-AUC | Parámetros | Entrenamiento | Inferencia |
-|---|---|---|---|---|---|---|---|
-| CNN final | 94,4% | 93,0% | 94,4% | 0,997 | 4.290.378 | 3,4 min | 6,2 ms |
-| MLP final | 69,2% | 65,1% | 69,2% | 0,964 | 12.626.762 | 1,5 min | 4,6 ms |
+| Modelo | Accuracy | F1 macro | Parámetros |
+|---|---:|---:|---:|
+| CNN | 94,4% | 93,0% | 4.290.378 |
+| MLP | 69,2% | 65,1% | 12.626.762 |
 
-La CNN es el modelo recomendado. La MLP queda como línea base y alternativa liviana. Los modelos se publican en el release `v2.0`.
-
-La brecha train-test de 5,5 y 18,5 puntos del informe corresponde a la última época. En la mejor época, que es la que se guarda, es 5,4 y 15,7. Las curvas marcan la mejor época y la ventana de paciencia.
-
-## Qué cambió respecto de la EP2
-
-| Elemento | EP2 | EP3 |
-|---|---|---|
-| Dataset y split | Tomate, 10 clases, 80/10/10 | Se mantiene sin cambios |
-| Arquitecturas | MLP base y CNN base | MLP y CNN con regularización |
-| Aumento de datos | No | Volteo, rotación, zoom, traslación y contraste |
-| Optimización | Configuración fija | Screening y Random Search |
-| Métricas | Accuracy y F1 macro | Accuracy, F1 macro, F1 ponderado y ROC-AUC |
-| Auditoría | Análisis de errores | Auditoría de entrada, sistema y aplicación |
-| XAI | Grad-CAM | Grad-CAM y LIME |
-| Documentación | README breve | README, informe, defensa y presentación |
+La CNN es el modelo recomendado. La brecha de 5,4 y 15,7 puntos corresponde a la mejor época, que es la que se guarda.
 
 ## Pipeline
 
-1. Carga del split y de las clases.
-2. Análisis exploratorio y balance.
-3. Preprocesamiento y aumento de datos.
-4. Construcción de la MLP o la CNN.
-5. Entrenamiento con parada temprana.
-6. Regularización con Dropout, BatchNorm, L2 y aumento.
-7. Evaluación con métricas, matrices y curvas.
-8. Auditoría de sesgos y prueba de estrés.
-9. Optimización y selección del modelo final.
-
-El notebook desarrolla cada etapa. Las funciones están separadas y documentadas en celdas Markdown. Los artefactos se guardan en `models/` y las figuras en `images/`.
+Carga, EDA, preprocesamiento, aumento, MLP y CNN, entrenamiento, evaluación, auditoría y XAI. Ablación, screening y Random Search. El test se reserva para la evaluación final.
 
 ## Estructura
 
-```
-tly1102-tomate/
-  README.md
-  INFORME_TECNICO.md
-  DEFENSA_EP3.md
-  requirements.txt
-  LICENSE
-  data/
-    README.md
-    split.csv
-    class_names.json
-  notebooks/
-    EP3_Gutierrez_Larenas_Mena.ipynb
-  models/
-    README.md
-    experimentos.csv
-    metricas_finales.json
-    comparacion_final.csv
-    historial/
-    reportes/
-  images/
-  docs/
-    presentacion.md
-  legacy/
-    EP2_Gutierrez_Larenas_Mena.ipynb
-    README_EP2.md
-    images/
-    models/
-```
+- `data/`: `split.csv` y `class_names.json`.
+- `notebooks/`: notebook EP3.
+- `models/`: métricas, experimentos e historiales. Los modelos entrenados están en el release `v2.0`.
+- `images/`: figuras del notebook y del informe.
 
-## Cómo ejecutar
+## Limitaciones
 
-### Google Colab
-
-1. Abrir el notebook en Colab.
-2. Subir `PlantVillage Dataset.zip` a la raíz del repositorio en `/content/tly1102-tomate`.
-3. Ejecutar todas las celdas. La primera celda instala `lime` si falta.
-4. Usar una GPU T4 o superior. La corrida completa tarda cerca de 2 a 3 horas en la GPU local.
-
-### Local
-
-```bash
-git clone https://github.com/mtgutierrezh/tly1102-tomate.git
-cd tly1102-tomate
-pip install -r requirements.txt
-jupyter lab notebooks/EP3_Gutierrez_Larenas_Mena.ipynb
-```
-
-El dataset se descarga desde Kaggle como `emmarex/plantdisease` y se descomprime en `data/PlantVillage`. La carpeta no se versiona porque pesa cerca de 371 MB.
-
-## Reproducibilidad
-
-- `SEED=42` para el split y las corridas.
-- `data/split.csv` fija las 16.011 imágenes en train, validation y test.
-- `data/class_names.json` fija el orden de las diez clases.
-- Las imágenes se redimensionan a 128 x 128 y se normalizan con `Rescaling(1/255)`.
-- La búsqueda de hiperparámetros se ejecuta en el notebook y se registra en `models/experimentos.csv`.
-- Los modelos finales se publican en el release `v2.0` y no se versionan en git.
-
-## Entregables
-
-| Archivo | Contenido |
-|---|---|
-| `notebooks/EP3_Gutierrez_Larenas_Mena.ipynb` | Pipeline completo, experimentos y figuras |
-| `INFORME_TECNICO.md` | Informe con problema, KPIs, CRISP-DM y resultados |
-| `DEFENSA_EP3.md` | Guion de 10 minutos y 40 preguntas |
-| `docs/presentacion.md` | Contenido de 12 diapositivas |
-| `models/metricas_finales.json` | Métricas finales y configuración |
-| `models/experimentos.csv` | Registro de las 30 corridas |
-| Release `v2.0` | Modelos, métricas, figuras y split |
-
-## Limitaciones y ética
-
-El dataset es de laboratorio, con hoja centrada y fondo uniforme. El test es una partición interna y no hay validación externa. El modelo no debe usarse como diagnóstico autónomo. Se recomienda como apoyo a la priorización de casos, con revisión humana y monitoreo del desempeño por clase. El desbalance se documenta y se audita, pero no se corrige con pesos de clase para mantener la comparación con la EP2.
-
-## Enlaces
-
-- Repositorio: https://github.com/mtgutierrezh/tly1102-tomate
-- Release: https://github.com/mtgutierrezh/tly1102-tomate/releases/tag/v2.0
-- Informe: `INFORME_TECNICO.md`
-- Defensa: `DEFENSA_EP3.md`
-- Presentación: `docs/presentacion.md`
-- EP2: `legacy/README_EP2.md`
+Imágenes de laboratorio, desbalance de clases, sin validación de campo, uso académico y no diagnóstico autónomo.
