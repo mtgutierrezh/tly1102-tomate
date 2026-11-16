@@ -47,8 +47,8 @@ Contenido para 12 diapositivas. Cada bloque se puede copiar a PowerPoint o Canva
 
 ## Diapositiva 5. Modelos MLP y CNN
 
-- MLP: Flatten, Dense 512, 256 y 128, salida 10, {{MLP_PARAMS}} parámetros.
-- CNN: Conv2D 32, 64 y 128, MaxPooling, Dense 128, salida 10, {{CNN_PARAMS}} parámetros.
+- MLP: Flatten, Dense 512, 256 y 128, salida 10, 12.626.762 parámetros.
+- CNN: Conv2D 32, 64 y 128, MaxPooling, Dense 128, salida 10, 4.290.378 parámetros.
 - La CNN conserva la estructura espacial y comparte pesos.
 - La MLP es la línea base y la alternativa liviana.
 
@@ -80,8 +80,8 @@ Contenido para 12 diapositivas. Cada bloque se puede copiar a PowerPoint o Canva
 
 ## Diapositiva 8. Resultados
 
-- CNN final: accuracy {{CNN_ACC}}, F1 macro {{CNN_F1}}.
-- MLP final: accuracy {{MLP_ACC}}, F1 macro {{MLP_F1}}.
+- CNN final: accuracy 94,4%, F1 macro 93,0%.
+- MLP final: accuracy 69,2%, F1 macro 65,1%.
 - La CNN usa menos parámetros y tarda más por época.
 - La brecha train-test se reporta para las dos arquitecturas.
 
@@ -103,7 +103,7 @@ Contenido para 12 diapositivas. Cada bloque se puede copiar a PowerPoint o Canva
 ## Diapositiva 10. Explicabilidad
 
 - Grad-CAM en la CNN: regiones que sostienen la predicción.
-- LIME en la MLP: perturbaciones locales sobre la imagen aplanada.
+- LIME en la MLP: perturbaciones locales sobre la imagen que recibe la red.
 - Revisamos aciertos y errores para ver si el modelo mira la hoja o el fondo.
 - Las explicaciones no prueban causalidad, pero ayudan a auditar.
 
@@ -113,8 +113,8 @@ Contenido para 12 diapositivas. Cada bloque se puede copiar a PowerPoint o Canva
 
 ## Diapositiva 11. Comparación y recomendación
 
-- La CNN gana en F1 macro, generalización y robustez.
-- La MLP gana en tiempo de entrenamiento y simplicidad.
+- La CNN gana en F1 macro y generalización, la MLP en tiempo y simplicidad.
+- La prueba de estrés se aplicó solo a la CNN, no a la MLP.
 - Recomendamos la CNN como modelo principal y la MLP como línea base.
 - No recomendamos un diagnóstico autónomo. Recomendamos apoyo con revisión humana.
 
@@ -125,7 +125,7 @@ Contenido para 12 diapositivas. Cada bloque se puede copiar a PowerPoint o Canva
 ## Diapositiva 12. Conclusiones y limitaciones
 
 - Pipeline reproducible, con split fijo, semillas y artefactos.
-- La regularización y el aumento mejoran la generalización.
+- La ablación mide el efecto de la regularización y el aumento.
 - La limitación principal es el dataset de laboratorio y la falta de validación externa.
 - Trabajo futuro: imágenes de campo, calibración y validación con agrónomos.
 

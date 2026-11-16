@@ -12,7 +12,7 @@
 
 ## 1. Resumen ejecutivo
 
-{{RESUMEN_EJECUTIVO}}
+La CNN final alcanzó 94,4% de accuracy y 93,0% de F1 macro en el conjunto de prueba. La MLP final alcanzó 69,2% y 65,1% en las mismas métricas. La búsqueda seleccionó una CNN con lr 1e-04, batch 32, dropout conv 0,00, dropout denso 0,20, filtros [32, 64, 128], L2 0e+00. La CNN usa 4.290.378 parámetros frente a 12.626.762 de la MLP y generaliza mejor. El modelo se recomienda como apoyo a la priorización de casos, con revisión humana.
 
 El trabajo se organiza en un pipeline de nueve etapas, dos arquitecturas comparables y una búsqueda de hiperparámetros con selección por F1 macro de validación. El conjunto de prueba se reserva para la evaluación final. La comparación incluye métricas de desempeño, generalización, costo computacional, auditoría de sesgos y explicabilidad.
 
@@ -55,7 +55,18 @@ El KPI principal es el F1 macro. El dataset está desbalanceado y la accuracy pu
 
 ## 5. Fuentes de datos
 
-{{TABLA_DATOS}}
+| Clase                                       |   train |   val |   test |   total |
+|:--------------------------------------------|--------:|------:|-------:|--------:|
+| Tomato_Bacterial_spot                       |   1,701 |   213 |    213 |   2,127 |
+| Tomato_Early_blight                         | 800     |   100 |    100 |   1     |
+| Tomato_Late_blight                          |   1,527 |   191 |    191 |   1,909 |
+| Tomato_Leaf_Mold                            | 762     |    95 |     95 | 952     |
+| Tomato_Septoria_leaf_spot                   |   1,417 |   177 |    177 |   1,771 |
+| Tomato_Spider_mites_Two_spotted_spider_mite |   1,341 |   167 |    168 |   1,676 |
+| Tomato__Target_Spot                         |   1,123 |   140 |    141 |   1,404 |
+| Tomato__Tomato_YellowLeaf__Curl_Virus       |   2,566 |   321 |    321 |   3,208 |
+| Tomato__Tomato_mosaic_virus                 | 298     |    38 |     37 | 373     |
+| Tomato_healthy                              |   1,273 |   159 |    159 |   1,591 |
 
 Usamos el subconjunto de tomate de PlantVillage, disponible en Kaggle como `emmarex/plantdisease`. Las imágenes originales son de 256 x 256 píxeles y el modelo las recibe a 128 x 128. El split es estratificado 80/10/10 con `random_state=42` y se guardó en `data/split.csv` para que todas las corridas usen exactamente las mismas imágenes.
 
@@ -106,8 +117,8 @@ El pipeline se implementa con funciones separadas y sin clases. Cada función re
 
 | Modelo | Arquitectura | Regularización | Parámetros |
 |---|---|---|---|
-| MLP | Entrada 128 x 128 x 3, Flatten, Dense 512, 256 y 128, salida 10 | Dropout, BatchNorm, L2 y aumento según configuración | {{MLP_PARAMS}} |
-| CNN | Tres bloques Conv2D de 32, 64 y 128 filtros, MaxPooling, Dense 128, salida 10 | Dropout, BatchNorm, L2 y aumento según configuración | {{CNN_PARAMS}} |
+| MLP | Entrada 128 x 128 x 3, Flatten, Dense 512, 256 y 128, salida 10 | Dropout, BatchNorm, L2 y aumento según configuración | 12.626.762 |
+| CNN | Tres bloques Conv2D de 32, 64 y 128 filtros, MaxPooling, Dense 128, salida 10 | Dropout, BatchNorm, L2 y aumento según configuración | 4.290.378 |
 
 La MLP aplana la imagen y pierde la estructura espacial. La CNN comparte pesos en toda la imagen y conserva la noción de vecindad. Esa diferencia es la hipótesis principal de la comparación. La MLP se mantiene como línea base porque la EP2 la usó y porque permite medir cuánto aporta la convolución.
 
@@ -115,9 +126,16 @@ La CNN usa filtros de 3 x 3, activación ReLU, inicialización He y `padding='sa
 
 ## 10. Regularización y aumento de datos
 
-{{ABLACION_TEXTO}}
+La mejor configuración de la ablación fue A3_batch_norm con un F1 macro de validación de 91,7%. La CNN sin regularización obtuvo 90,8%, una diferencia de 1,0 puntos porcentuales. La técnica que más aportó fue A3_batch_norm. La brecha entre train y validación de la mejor variante fue de 6,5 puntos.
 
-{{TABLA_ABLACION}}
+| Experimento           | F1 macro val   | Accuracy val   | Brecha val   | Parámetros   | Tiempo   |
+|:----------------------|:---------------|:---------------|:-------------|:-------------|:---------|
+| A3_batch_norm         | 91,7%          | 93,2%          | 6,5 pp       | 4,290,378    | 3,3 min  |
+| A1_sin_regularizacion | 90,8%          | 92,1%          | 7,6 pp       | 4,288,970    | 3,9 min  |
+| A2_dropout            | 90,6%          | 91,8%          | 1,0 pp       | 4,288,970    | 7,7 min  |
+| A4_l2                 | 89,7%          | 91,0%          | 7,2 pp       | 4,288,970    | 3,0 min  |
+| A5_aumento            | 78,7%          | 80,3%          | 11,4 pp      | 4,288,970    | 3,0 min  |
+| A6_mlp_base           | 47,5%          | 60,0%          | -6,6 pp      | 25,331,850   | 2,7 min  |
 
 ![F1 macro de la ablación](images/ablacion_f1.png)
 
@@ -129,27 +147,48 @@ La parada temprana monitorea `val_loss` con paciencia 5 y restaura los mejores p
 
 ## 11. Optimización de hiperparámetros
 
-{{SCREENING_TEXTO}}
+El mejor resultado del screening fue B5_dropout_dense_0.2 con un F1 macro de validación de 93,8%. La base regularizada obtuvo 68,1%. El cambio que más redujo el desempeño fue B4_dropout_conv_0.1. El screening permitió descartar los cambios que no aportaban antes de combinar hiperparámetros.
 
-{{TABLA_SCREENING}}
+| Experimento           | F1 macro val   | Accuracy val   | Brecha val   | Parámetros   | Tiempo   |
+|:----------------------|:---------------|:---------------|:-------------|:-------------|:---------|
+| B5_dropout_dense_0,2  | 93,8%          | 94,9%          | 5,0 pp       | 4,290,378    | 3,3 min  |
+| B6_filtros_64_128_256 | 93,7%          | 94,8%          | 5,1 pp       | 8,763,146    | 5,9 min  |
+| B2_lr_1e-3            | 93,3%          | 94,1%          | 5,4 pp       | 4,290,378    | 3,7 min  |
+| B7_l2_1e-5            | 92,7%          | 94,1%          | 5,8 pp       | 4,290,378    | 3,4 min  |
+| B3_batch_64           | 92,1%          | 93,8%          | 6,2 pp       | 4,290,378    | 3,5 min  |
+| B1_bn_base            | 91,5%          | 93,1%          | 6,4 pp       | 4,290,378    | 3,2 min  |
+| B8_aumento            | 75,4%          | 78,0%          | 17,4 pp      | 4,290,378    | 6,5 min  |
+| B4_dropout_conv_0,1   | 68,1%          | 76,8%          | 22,8 pp      | 4,290,378    | 3,4 min  |
 
 ![F1 macro del screening](images/screening_f1.png)
 
 Descartamos GridSearchCV porque obliga a envolver el modelo de Keras y multiplica el costo por cada fold de validación cruzada. Descartamos la optimización bayesiana porque requiere una librería adicional y con ocho evaluaciones no compensa la complejidad. Usamos un screening univariado para conocer la dirección de cada hiperparámetro y luego un Random Search con presupuesto fijo.
 
-{{BUSQUEDA_TEXTO}}
+La mejor configuración de la búsqueda fue C1_mejor_screening con un F1 macro de validación de 93,9%. Quedó con tasa de aprendizaje 1e-04, batch 32, dropout convolucional 0,00 y dropout denso 0,20. Superó a la mejor del screening por 0,1 puntos porcentuales.
 
-{{TABLA_BUSQUEDA}}
+| Experimento        |     LR |   Batch | Drop. conv   | Drop. denso   | Filtros    |     L2 | F1 macro val   | Brecha val   |
+|:-------------------|-------:|--------:|:-------------|:--------------|:-----------|-------:|:---------------|:-------------|
+| C1_mejor_screening | 0,0001 |      32 | 0,00         | 0,20          | 32-64-128  | 0      | 93,9%          | 4,8 pp       |
+| C5_aleatorio       | 0,0001 |      32 | 0,01         | 0,25          | 64-128-256 | 0      | 92,4%          | 5,5 pp       |
+| C7_aleatorio       | 0,0001 |      64 | 0,03         | 0,20          | 32-64-128  | 0,0001 | 89,5%          | 8,0 pp       |
+| C3_aleatorio       | 0,0002 |      32 | 0,15         | 0,24          | 64-128-256 | 1e-05  | 87,8%          | 8,5 pp       |
+| C4_aleatorio       | 0,0001 |      32 | 0,13         | 0,25          | 32-64-128  | 0,0001 | 78,1%          | 13,5 pp      |
+| C2_aleatorio       | 7e-05  |      64 | 0,09         | 0,26          | 32-64-128  | 0,0001 | 70,6%          | 19,2 pp      |
+| C6_aleatorio       | 0,0002 |      32 | 0,18         | 0,23          | 32-64-128  | 0,0001 | 69,9%          | 17,2 pp      |
+| C8_aleatorio       | 0,0002 |      32 | 0,09         | 0,06          | 64-128-256 | 1e-05  | 69,9%          | 18,3 pp      |
 
 ![F1 macro de la búsqueda aleatoria](images/busqueda_f1.png)
 
-El espacio de búsqueda cubre la tasa de aprendizaje en escala logarítmica entre 1e-4 y 1e-3, el tamaño de lote entre 32 y 64, el Dropout convolucional entre 0,2 y 0,4, el Dropout denso entre 0,3 y 0,5, dos configuraciones de filtros y L2 en escala logarítmica entre 1e-5 y 1e-3. La selección se hace por F1 macro de validación. El test no se usa para elegir.
+El espacio de búsqueda cubre la tasa de aprendizaje en escala logarítmica entre 5e-5 y 1e-3, el tamaño de lote entre 32 y 64, el Dropout convolucional entre 0,0 y 0,2, el Dropout denso entre 0,0 y 0,3, dos configuraciones de filtros, L2 en 0, 1e-5 y 1e-4 y el aumento de datos como variable binaria. La selección se hace por F1 macro de validación. El test no se usa para elegir.
 
 ## 12. Resultados experimentales
 
-{{RESULTADOS_TEXTO}}
+La CNN final obtuvo 94,4% de accuracy y 93,0% de F1 macro en test, con una brecha train-test de 5,5 puntos. La MLP final obtuvo 69,2% de accuracy y 65,1% de F1 macro, con una brecha de 18,5 puntos. La diferencia de 27,9 puntos de F1 macro y la menor variación entre semillas de la CNN respaldan la elección de la CNN.
 
-{{TABLA_FINAL}}
+| Modelo    | Accuracy   | F1 macro   | F1 ponderado   |   ROC-AUC | Parámetros   | Entrenamiento   | Inferencia   | Brecha test   | F1 media   | F1 desviación   |
+|:----------|:-----------|:-----------|:---------------|----------:|:-------------|:----------------|:-------------|:--------------|:-----------|:----------------|
+| CNN final | 94,4%      | 93,0%      | 94,4%          |     0,997 | 4,290,378    | 3,4 min         | 6,2 ms       | 5,5 pp        | 93,0%      | 0,1 pp          |
+| MLP final | 69,2%      | 65,1%      | 69,2%          |     0,964 | 12,626,762   | 1,5 min         | 4,6 ms       | 18,5 pp       | 57,9%      | 6,8 pp          |
 
 ![Curvas de la CNN final](images/curvas_cnn_final_semilla_42.png)
 
@@ -159,13 +198,29 @@ La CNN final se entrena con la mejor configuración y tres semillas. La semilla 
 
 ## 13. Auditoría de sesgos
 
-{{AUDITORIA_TEXTO}}
+Las clases con menor recall fueron Tomato_Early_blight (80,0%), Tomato_Late_blight (90,6%), Tomato__Target_Spot (92,2%). La diferencia entre F1 ponderado y F1 macro fue de 1,5 puntos, lo que confirma que las clases frecuentes pesan más. La CNN clasificó 2 casos sanos como enfermedad. En la prueba de estrés, el F1 macro cayó a 67,7% en el escenario contraste_bajo.
 
-{{TABLA_AUDITORIA}}
+| Clase                                       |   Precision |   Recall |    F1 |   Soporte |
+|:--------------------------------------------|------------:|---------:|------:|----------:|
+| Tomato_Bacterial_spot                       |       0,986 |    0,995 | 0,991 |       213 |
+| Tomato_Early_blight                         |       0,808 |    0,800 | 0,804 |       100 |
+| Tomato_Late_blight                          |       0,911 |    0,906 | 0,908 |       191 |
+| Tomato_Leaf_Mold                            |       0,899 |    0,937 | 0,918 |        95 |
+| Tomato_Septoria_leaf_spot                   |       0,970 |    0,927 | 0,948 |       177 |
+| Tomato_Spider_mites_Two_spotted_spider_mite |       0,951 |    0,923 | 0,937 |       168 |
+| Tomato__Target_Spot                         |       0,890 |    0,922 | 0,906 |       141 |
+| Tomato__Tomato_YellowLeaf__Curl_Virus       |       0,981 |    0,991 | 0,986 |       321 |
+| Tomato__Tomato_mosaic_virus                 |       0,875 |    0,946 | 0,909 |        37 |
+| Tomato_healthy                              |       1,000 |    0,987 | 0,994 |       159 |
 
 ![Confianza de la CNN en aciertos y errores](images/confianza_cnn.png)
 
-{{TABLA_ESTRES}}
+| Transformación   | Accuracy   | F1 macro   |
+|:-----------------|:-----------|:-----------|
+| brillo_bajo      | 79,5%      | 77,9%      |
+| brillo_alto      | 88,3%      | 86,5%      |
+| contraste_bajo   | 73,0%      | 67,7%      |
+| contraste_alto   | 84,1%      | 82,6%      |
 
 ![F1 macro bajo cambios de brillo y contraste](images/prueba_estres.png)
 
@@ -175,7 +230,7 @@ Las medidas de mitigación propuestas son aumentar la representación de las cla
 
 ## 14. Explicabilidad
 
-{{XAI_TEXTO}}
+Grad-CAM permite revisar las regiones que sostienen la predicción de la CNN. En los ejemplos revisados, el mapa se concentra en la hoja y, en varios casos, en la zona de la lesión. En los errores, la atención se dispersa hacia el fondo o hacia tejido sano. LIME en la MLP resalta regiones más fragmentadas, consistente con la pérdida de estructura espacial al aplanar la imagen. Las dos técnicas se usan como auditoría cualitativa y no como prueba de causalidad.
 
 ![Grad-CAM en una imagen por clase](images/gradcam_clases.png)
 
@@ -189,9 +244,12 @@ Las dos técnicas no prueban causalidad. Sirven para revisar si el modelo mira l
 
 ## 15. Comparación MLP vs CNN
 
-{{COMPARACION_TEXTO}}
+La CNN superó a la MLP por 27,9 puntos de F1 macro en test. Usa 2,9 veces menos parámetros. El entrenamiento de la CNN tardó 3,4 min y el de la MLP 1,5 min. La MLP conserva una ventaja en simplicidad y tiempo de inferencia. Por desempeño y generalización, recomendamos la CNN.
 
-{{TABLA_COMPARACION}}
+| Modelo    | Accuracy   | F1 macro   | F1 ponderado   |   ROC-AUC | Parámetros   | Entrenamiento   | Inferencia   | Brecha test   | F1 media   | F1 desviación   |
+|:----------|:-----------|:-----------|:---------------|----------:|:-------------|:----------------|:-------------|:--------------|:-----------|:----------------|
+| CNN final | 94,4%      | 93,0%      | 94,4%          |     0,997 | 4,290,378    | 3,4 min         | 6,2 ms       | 5,5 pp        | 93,0%      | 0,1 pp          |
+| MLP final | 69,2%      | 65,1%      | 69,2%          |     0,964 | 12,626,762   | 1,5 min         | 4,6 ms       | 18,5 pp       | 57,9%      | 6,8 pp          |
 
 ![Comparación de accuracy y F1 macro](images/comparacion_modelos.png)
 
@@ -203,9 +261,24 @@ Las dos técnicas no prueban causalidad. Sirven para revisar si el modelo mira l
 | Tiempo de entrenamiento | Menor | Mayor | La CNN es más costosa por época |
 | Tiempo de inferencia | Menor | Mayor | Ambas son rápidas para una imagen |
 | Interpretabilidad | LIME | Grad-CAM | La CNN tiene una explicación espacial más natural |
-| Robustez | Menor | Mayor | La CNN resiste mejor cambios de brillo y contraste |
+| Prueba de estrés | No aplicada en esta entrega | Evaluada con cuatro cambios de brillo y contraste | La prueba se aplicó solo a la CNN |
 
-{{TABLA_DECISIONES}}
+| Decisión | Alternativa descartada | Razón |
+|---|---|---|
+| Mantener tomate y diez clases | Cambiar de dataset | Conserva la trazabilidad con la EP1 y la EP2 |
+| Usar 128 x 128 | Usar 256 x 256 | Reduce el costo y mantiene la comparación con la EP2 |
+| Split 80/10/10 estratificado | Split aleatorio | Conserva las proporciones de clases |
+| F1 macro como KPI | Solo accuracy | El dataset está desbalanceado |
+| CNN como modelo principal | Solo MLP | La convolución aprovecha la estructura espacial |
+| Random Search | GridSearchCV | Menor costo con un presupuesto fijo |
+| Random Search | Búsqueda bayesiana | No se justifica con ocho evaluaciones |
+| Tres semillas | Una semilla | Permite reportar variabilidad |
+| Test solo al final | Ajustar con test | Evita fuga de información |
+| Sin pesos de clase | Con pesos de clase | Mantiene la comparación y deja el sesgo a la auditoría |
+| Sin transfer learning | Con transfer learning | El foco es la comparación y el pipeline |
+| Grad-CAM para la CNN | SHAP para la CNN | Grad-CAM es espacial y está alineado con el curso |
+| LIME para la MLP | Grad-CAM para la MLP | La MLP no tiene capas convolucionales |
+| No desplegar | Poner en producción | No hay validación de campo |
 
 La recomendación es usar la CNN como modelo principal y mantener la MLP como línea base y alternativa liviana. La CNN no se recomienda como diagnóstico autónomo. Se recomienda como apoyo a la priorización de casos, con revisión humana y con un monitoreo del desempeño por clase.
 
@@ -224,7 +297,7 @@ El trabajo futuro incluye recolectar imágenes de campo, evaluar la calibración
 
 ## 17. Conclusiones
 
-{{CONCLUSIONES_TEXTO}}
+El pipeline permitió comparar las dos arquitecturas con el mismo split y las mismas condiciones. La CNN fue el mejor modelo por F1 macro y generalización, con 93,0% frente a 65,1% de la MLP. La MLP quedó como línea base y alternativa liviana. La limitación principal es el dataset de laboratorio y la falta de validación externa.
 
 El pipeline quedó documentado y reproducible. El split, las semillas, las configuraciones y las métricas están en el repositorio. Cualquier persona puede repetir la corrida y comparar sus resultados con los de este informe. Esa trazabilidad es el aporte principal del trabajo, más allá de la diferencia entre las dos arquitecturas.
 

@@ -1,6 +1,6 @@
 # Modelos
 
-Los modelos finales se publican como assets del release `v2.0`. No se versionan en git porque la MLP pesa cerca de 97 MB y la CNN cerca de 17 MB.
+Los modelos finales se publican como assets del release `v2.0`. No se versionan en git porque la MLP pesa cerca de 49 MB y la CNN cerca de 17 MB.
 
 Enlace del release: https://github.com/mtgutierrezh/tly1102-tomate/releases/tag/v2.0
 

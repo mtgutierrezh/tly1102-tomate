@@ -16,7 +16,7 @@ Usamos el subconjunto de tomate de PlantVillage, con 16.011 imágenes y diez cla
 
 ### 3:00 a 4:30. Pipeline y modelos
 
-El pipeline tiene nueve etapas, desde la carga hasta la auditoría. Cada etapa está en una función y deja artefactos en `models/` o `images/`. La MLP aplana la imagen y usa capas densas de 512, 256 y 128. La CNN usa tres bloques convolucionales de 32, 64 y 128 filtros, con MaxPooling, BatchNorm, Dropout y una capa densa final. La CNN tiene {{CNN_PARAMS}} parámetros y la MLP {{MLP_PARAMS}}. La diferencia clave es que la CNN conserva la estructura espacial y comparte pesos.
+El pipeline tiene nueve etapas, desde la carga hasta la auditoría. Cada etapa está en una función y deja artefactos en `models/` o `images/`. La MLP aplana la imagen y usa capas densas de 512, 256 y 128. La CNN usa tres bloques convolucionales de 32, 64 y 128 filtros, con MaxPooling, BatchNorm, Dropout y una capa densa final. La CNN tiene 4.290.378 parámetros y la MLP 12.626.762. La diferencia clave es que la CNN conserva la estructura espacial y comparte pesos.
 
 ### 4:30 a 6:00. Regularización y optimización
 
@@ -24,11 +24,11 @@ Aplicamos Dropout, BatchNorm, L2, aumento de datos y parada temprana. La ablaci�
 
 ### 6:00 a 8:00. Resultados, auditoría y XAI
 
-La CNN final alcanza {{CNN_ACC}} de accuracy y {{CNN_F1}} de F1 macro. La MLP final alcanza {{MLP_ACC}} y {{MLP_F1}}. La CNN usa menos parámetros y tarda más por época. La auditoría muestra el desempeño por clase, la confusión entre Early blight y Late blight, la confianza en aciertos y errores y una prueba de estrés con cambios de brillo y contraste. Grad-CAM muestra que la CNN mira la hoja y no el fondo en la mayoría de los casos. LIME muestra las regiones que sostienen la predicción de la MLP. Las dos técnicas ayudan a revisar el modelo, pero no prueban causalidad.
+La CNN final alcanza 94,4% de accuracy y 93,0% de F1 macro. La MLP final alcanza 69,2% y 65,1%. La CNN usa menos parámetros y tarda más por época. La auditoría muestra el desempeño por clase, la confusión entre Early blight y Late blight, la confianza en aciertos y errores y una prueba de estrés con cambios de brillo y contraste. Grad-CAM muestra que la CNN mira la hoja y no el fondo en la mayoría de los casos. LIME muestra las regiones que sostienen la predicción de la MLP. Las dos técnicas ayudan a revisar el modelo, pero no prueban causalidad.
 
 ### 8:00 a 9:00. Comparación y recomendación
 
-La CNN gana en F1 macro, generalización y robustez. La MLP gana en tiempo de entrenamiento y simplicidad. Recomendamos la CNN como modelo principal y la MLP como línea base. No recomendamos un diagnóstico autónomo. Recomendamos un uso de apoyo, con revisión humana de los casos de baja confianza.
+La CNN gana en F1 macro y generalización. La MLP gana en tiempo de entrenamiento y simplicidad. La prueba de estrés se aplicó solo a la CNN, así que no usamos ese resultado para afirmar una ventaja de robustez. Recomendamos la CNN como modelo principal y la MLP como línea base. No recomendamos un diagnóstico autónomo. Recomendamos un uso de apoyo, con revisión humana de los casos de baja confianza.
 
 ### 9:00 a 10:00. Limitaciones y cierre
 
@@ -44,17 +44,17 @@ La limitación principal es el dataset de laboratorio. No hay imágenes de campo
 | Test | 1.602 |
 | Clases | 10 |
 | Razón de desbalance | 8,6 a 1 |
-| Parámetros CNN | {{CNN_PARAMS}} |
-| Parámetros MLP | {{MLP_PARAMS}} |
-| Accuracy CNN | {{CNN_ACC}} |
-| F1 macro CNN | {{CNN_F1}} |
-| Accuracy MLP | {{MLP_ACC}} |
-| F1 macro MLP | {{MLP_F1}} |
-| Mejor configuración | {{MEJOR_CONFIG}} |
-| Tiempo CNN | {{CNN_TIME}} |
-| Tiempo MLP | {{MLP_TIME}} |
-| Inferencia CNN | {{CNN_INF}} |
-| Inferencia MLP | {{MLP_INF}} |
+| Parámetros CNN | 4.290.378 |
+| Parámetros MLP | 12.626.762 |
+| Accuracy CNN | 94,4% |
+| F1 macro CNN | 93,0% |
+| Accuracy MLP | 69,2% |
+| F1 macro MLP | 65,1% |
+| Mejor configuración | lr 1e-04, batch 32, dropout conv 0,00, dropout denso 0,20, filtros [32, 64, 128], L2 0e+00 |
+| Tiempo CNN | 3,4 min |
+| Tiempo MLP | 1,5 min |
+| Inferencia CNN | 6,2 ms |
+| Inferencia MLP | 4,6 ms |
 
 ## Decisiones y alternativas
 
@@ -199,7 +199,7 @@ La explicación es local y depende de las perturbaciones. No representa el compo
 ### Comparación y despliegue
 
 **36. ¿Por qué la CNN es el modelo recomendado?**  
-Porque obtiene mejor F1 macro, mejor generalización y mejor robustez ante cambios de brillo y contraste. Además tiene menos parámetros.
+Porque obtiene mejor F1 macro y mejor generalización. Además tiene menos parámetros. La prueba de estrés se aplicó solo a la CNN, así que no la usamos para afirmar una ventaja de robustez frente a la MLP.
 
 **37. ¿En qué gana la MLP?**  
 En tiempo de entrenamiento y simplicidad. Es una línea base útil y una alternativa liviana.

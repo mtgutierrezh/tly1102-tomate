@@ -9,8 +9,8 @@ Este repositorio contiene la Evaluación Parcial 3. Reutiliza el dataset y el sp
 
 | Modelo | Accuracy | F1 macro | F1 ponderado | ROC-AUC | Parámetros | Entrenamiento | Inferencia |
 |---|---|---|---|---|---|---|---|
-| CNN final | {{CNN_ACC}} | {{CNN_F1}} | {{CNN_F1W}} | {{CNN_AUC}} | {{CNN_PARAMS}} | {{CNN_TIME}} | {{CNN_INF}} |
-| MLP final | {{MLP_ACC}} | {{MLP_F1}} | {{MLP_F1W}} | {{MLP_AUC}} | {{MLP_PARAMS}} | {{MLP_TIME}} | {{MLP_INF}} |
+| CNN final | 94,4% | 93,0% | 94,4% | 0,997 | 4.290.378 | 3,4 min | 6,2 ms |
+| MLP final | 69,2% | 65,1% | 69,2% | 0,964 | 12.626.762 | 1,5 min | 4,6 ms |
 
 La CNN es el modelo recomendado. La MLP queda como línea base y alternativa liviana. Los modelos se publican en el release `v2.0`.
 
@@ -80,7 +80,7 @@ tly1102-tomate/
 1. Abrir el notebook en Colab.
 2. Subir `PlantVillage Dataset.zip` a la raíz del repositorio en `/content/tly1102-tomate`.
 3. Ejecutar todas las celdas. La primera celda instala `lime` si falta.
-4. Usar una GPU T4 o superior. La corrida completa tarda cerca de 8 horas en la GPU local.
+4. Usar una GPU T4 o superior. La corrida completa tarda cerca de 2 a 3 horas en la GPU local.
 
 ### Local
 
