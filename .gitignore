@@ -4,8 +4,10 @@ PlantVillage Dataset.zip
 backups/
 data/PlantVillage/
 data/plantvillage/
-models/mlp_ep2.keras
-.EP2_localrun.ipynb
+models/*.keras
+models/*.h5
+models/*.hdf5
+notebooks/*.log
 __pycache__/
 .ipynb_checkpoints/
 *.pyc
